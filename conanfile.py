@@ -26,29 +26,12 @@ class FontconfigConan(ConanFile):
         os.rename(extracted_dir, self.source_subfolder)
 
     def build(self):
-        #with tools.chdir(self.source_subfolder):
-        #    self.run("autoreconf -f -i")
-        #    
-        #    autotools = AutoToolsBuildEnvironment(self)
-        #    _args = ["--prefix=%s/builddir/install"%(os.getcwd()),"--disable-silent-rules","--disable-docs"]
-        #    if self.options.shared:
-        #        _args.extend(['--enable-shared=yes','--enable-static=no'])
-        #    else:
-        #        _args.extend(['--enable-shared=no','--enable-static=yes'])
-        #    autotools.configure(args=_args, 
-        #                        pkg_config_paths=['%s/lib/pkgconfig'%(self.deps_cpp_info["expat"].rootpath),
-        #                                          '%s/lib/pkgconfig'%(self.deps_cpp_info["freetype"].rootpath),
-        #                                          '%s/lib/pkgconfig'%(self.deps_cpp_info["zlib"].rootpath),
-        #                                          '%s/lib/pkgconfig'%(self.deps_cpp_info["bzip2"].rootpath)])
-        #    autotools.make(args=["-j2"])
-        #    autotools.install()
-        
         with tools.chdir(self.source_subfolder):
             if tools.os_info.is_linux:
                 with tools.environment_append({
-                    'PKG_CONFIG_PATH' : "%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig"
-                    %(self.deps_cpp_info["expat"].rootpath,self.deps_cpp_info["freetype"].rootpath,
-                    self.deps_cpp_info["zlib"].rootpath,self.deps_cpp_info["bzip2"].rootpath,self.deps_cpp_info["libpng"].rootpath,),
+                    #'PKG_CONFIG_PATH' : "%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig"
+                    #%(self.deps_cpp_info["expat"].rootpath,self.deps_cpp_info["freetype"].rootpath,
+                    #self.deps_cpp_info["zlib"].rootpath,self.deps_cpp_info["bzip2"].rootpath,self.deps_cpp_info["libpng"].rootpath,),
                     'LIBRARY_PATH' : '%s/lib:%s/lib'
                     %(self.deps_cpp_info["bzip2"].rootpath,self.deps_cpp_info["libpng"].rootpath),
                     'LD_LIBRARY_PATH' : '%s/lib:%s/lib'
@@ -56,15 +39,26 @@ class FontconfigConan(ConanFile):
                     }):
                     
                     self.run('autoreconf -f -i')
-                    self.run('./configure --prefix %s/builddir --libdir %s/builddir/lib'
-                    ' --disable-silent-rules --disable-docs'%(os.getcwd(),os.getcwd()))
-                    self.run("make -j2")
-                    self.run("make install")
+                    autotools = AutoToolsBuildEnvironment(self)
+                    _args = ["--prefix=%s/builddir/install"%(os.getcwd()),"--disable-silent-rules","--disable-docs"]
+                    if self.options.shared:
+                        _args.extend(['--enable-shared=yes','--enable-static=no'])
+                    else:
+                        _args.extend(['--enable-shared=no','--enable-static=yes'])
+                    autotools.configure(args=_args,
+                                        pkg_config_paths=["%s/lib/pkgconfig"%(self.deps_cpp_info["expat"].rootpath),
+                                                          "%s/lib/pkgconfig"%(self.deps_cpp_info["freetype"].rootpath),
+                                                          "%s/lib/pkgconfig"%(self.deps_cpp_info["zlib"].rootpath),
+                                                          "%s/lib/pkgconfig"%(self.deps_cpp_info["bzip2"].rootpath),
+                                                          "%s/lib/pkgconfig"%(self.deps_cpp_info["libpng"].rootpath),])
+                    autotools.make(args=["-j2"])
+                    autotools.install()
+
 
     def package(self):
         if tools.os_info.is_linux:
             with tools.chdir(self.source_subfolder):
-                self.copy("*", src="%s/builddir"%(os.getcwd()))
+                self.copy("*", src="%s/builddir/install"%(os.getcwd()))
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
