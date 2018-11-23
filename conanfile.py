@@ -50,10 +50,6 @@ class FontconfigConan(ConanFile):
 
 
     def source(self):
-        src_folder = os.path.join(self.source_folder,self._source_subfolder)
-        if self.settings.os == "Windows" and os.path.exists(src_folder):
-            os.removedirs(src_folder)
-
         url_ = "https://github.com/CentricularK/fontconfig.git"
         branch_ = "testing/2.13.0"
         git = tools.Git(folder=self._source_subfolder)
