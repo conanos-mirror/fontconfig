@@ -38,7 +38,7 @@ class FontconfigConan(ConanFile):
         self.build_requires("gperf/3.1@bincrafters/stable")
 
         if self.settings.os == "Linux":
-            self.build_requires("libuuid/1.0.3@bincrafters/stable")
+            self.build_requires("libuuid/1.0.3@conanos/stable")
             
 
     def config_options(self):
