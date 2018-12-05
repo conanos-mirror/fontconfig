@@ -19,7 +19,7 @@ class FontconfigConan(ConanFile):
         "shared": [True, False],
         "fPIC": [True, False],
     }
-    default_options = { 'shared': False, 'fPIC': True }
+    default_options = { 'shared': True, 'fPIC': True }
 
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
@@ -28,8 +28,6 @@ class FontconfigConan(ConanFile):
     def requirements(self):
         self.requires.add("expat/2.2.5@conanos/stable")
         self.requires.add("freetype/2.9.1@conanos/stable")
-
-        config_scheme(self)
 
     def build_requirements(self):
         self.build_requires("libpng/1.6.34@conanos/stable")
@@ -47,6 +45,7 @@ class FontconfigConan(ConanFile):
     
     def configure(self):
         del self.settings.compiler.libcxx
+        config_scheme(self)
 
 
     def source(self):
